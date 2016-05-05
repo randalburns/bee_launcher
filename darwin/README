@@ -1,0 +1,51 @@
+
+
+
+Passwordless ssh.
+
+ssh -i darwindkr.rsa docker@.......
+
+
+Thin provision a new image based on a COW of a base image.
+
+Thin provision two images:
+
+qemu-img create -b /projects/groups/vizproject/VMs/dkrubu16.qcow2 -f qcow2 ./tmp/d001.qcow2
+qemu-img create -b /projects/groups/vizproject/VMs/dkrubu16.qcow2 -f qcow2 ./tmp/d002.qcow2
+
+Create two definition files, changing the name, uuid, mac, and disk
+
+cp template_dkrubu16.xml tmp/d001.xml
+cp template_dkrubu16.xml tmp/d002.xml
+
+sed -i s/dkrubu16NNNN/d001/ tmp/d001.xml
+sed -i s/UUUU/0001/ tmp/d001.xml
+sed -i s/MM:MM/00:01/ tmp/d001.xml
+sed -i s#FFFF#$PWD/tmp/d001.qcow2# tmp/d001.xml
+
+sed -i s/dkrubu16NNNN/d002/ tmp/d002.xml
+sed -i s/UUUU/0002/ tmp/d002.xml
+sed -i s/MM:MM/00:02/ tmp/d002.xml
+sed -i s#FFFF#$PWD/tmp/d002.qcow2# tmp/d002.xml
+
+
+For d1
+  name -> d1
+  uuid last four 7F99 -> 0001
+  source file ->   <source file='/home/randalburns/bee/tmp/d1.qcow2'/>
+  mac last four 43:18 -> FF:01
+
+For d2
+  name -> d2
+  uuid last four 7F99 -> 0002
+  source file ->   <source file='/home/randalburns/bee/tmp/d2.qcow2'/>
+  mac last four 43:18 -> FF:02
+
+Launch VMs by scripting virsh
+
+Here are the interactive commands:
+  connect qemu:///system
+  define /home/randalburns/bee/tmp/d1.xml
+  define /home/randalburns/bee/tmp/d2.xml
+  start d1
+  start d2
