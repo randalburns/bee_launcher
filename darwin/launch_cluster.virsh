@@ -1,5 +1,0 @@
-connect qemu:///system
-define /home/randalburns/bee/tmp/d001.xml
-start d001
-define /home/randalburns/bee/tmp/d002.xml
-start d002
