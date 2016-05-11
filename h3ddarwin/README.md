@@ -13,11 +13,13 @@ It is customized for Darwin and will not work without modification on other clus
   * machine\_img.qcow2: a virtual machine image that contains the source code (research do not distributed) in expected places.  You should use _/projects/groups/vizproject/VMs/dkrh3dubu16.img_ unless you have customized an image.
   * run_directory: temporary directory used to run the cluster.  This needs to be shared among all nodes in the cluster.  It would be desirable to place this on memory or an SSD if/when shared fast storage is available.
   * --node <node1>: add one entry for each node.  Machine name only, not FQDN.
+
 A typical launch process might look like:
 ````
 darwin-fe> salloc -N 2 -p galton
 darwin-fe> squeue -u <username>       // say this returns cn180 and cn181
 darwin-fe> python launch\_cluster.py ./template\_dkrh3d.xml /projects/groups/vizproject/VMs/dkrh3dubu16.img ./tmp --node cn180 --node cn181
+````
 
 This script will do the following:
  * thin provision virtual machines from the base image--it will not change the given machine image.
