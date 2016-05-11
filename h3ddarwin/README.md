@@ -4,7 +4,7 @@
 These scripts launch, login, stop and teardown a cluster running H3D on Darwin.
 It is customized for Darwin and will not work without modification on other clusters.
 
-<h5> Launch a Cluster <h5>
+<h5> Launch a Cluster </h5>
 
 ````
   python launch_cluster.py <template.xml> <machine_img.qcow2> <run_directory> --node <node0> --node <node1> ... --node <noden>
