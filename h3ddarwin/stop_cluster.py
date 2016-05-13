@@ -10,6 +10,7 @@ def main():
 
   parser = argparse.ArgumentParser(description='Stop docker on nodes, but leave virtual machines up.')
   parser.add_argument('--node', action="append")
+  parser.add_argument('--verbose', action="store_true")
 
   result = parser.parse_args()
 
@@ -28,7 +29,8 @@ def main():
     nodeip = m.group(1)
 
     cmd = ["ssh","{}".format(node),"-x",r"ssh -o StrictHostKeyChecking=no -i {}/darwindkr.rsa docker@{} -x /home/docker/h3ddocker/stop_h3d.sh".format(os.path.dirname(os.path.realpath(__file__)),nodeip)]
-    print cmd
+    if result.verbose:
+      print cmd
     subprocess.call(cmd)
 
 

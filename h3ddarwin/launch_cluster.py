@@ -7,6 +7,8 @@ import tempfile
 def main():
 
   parser = argparse.ArgumentParser(description='Launch H3D in a VM on this darwin node')
+  parser.add_argument('--interactive', action="store_true")
+  parser.add_argument('--verbose', action="store_true")
   parser.add_argument('--node', action="append")
   parser.add_argument('template', action="store" )
   parser.add_argument('qcow2image', action="store" )
@@ -27,11 +29,13 @@ def main():
     runxml = "{}/{}.xml".format(os.path.abspath(result.tmpdir),runname) 
 
     cmd=["qemu-img","create","-b","{}".format(qcow2image),"-f","qcow2","{}".format(runimg)]
-    print cmd
+    if result.verbose:
+      print cmd
     subprocess.call(cmd)
 
     cmd = ["cp","{}".format(template),"{}".format(runxml)]
-    print cmd
+    if result.verbose:
+      print cmd
     subprocess.call(cmd)
 
     # Rewrite the template
@@ -45,7 +49,8 @@ def main():
     subprocess.call(cmd)
 
     cmd = ["ssh","{}".format(node),"-x",r"virsh 'connect qemu:///system; define {}; start {}'".format(runxml,runname)]
-    print cmd
+    if result.verbose:
+      print cmd
     subprocess.call(cmd)
 
   print "Waiting 10 seconds for nodes to come up";
@@ -70,7 +75,8 @@ def main():
 
     # activate the second interface on the darwin node
     cmd = ["ssh", "{}".format(node),"-x", r"ssh -o StrictHostKeyChecking=no -i {}/darwindkr.rsa docker@{} -x 'sudo /sbin/ifconfig ens8 10.0.0.{} netmask 255.255.255.0'".format(os.path.dirname(os.path.realpath(__file__)),nodeip,nodeid)]
-    print cmd
+    if result.verbose:
+      print cmd
     subprocess.call(cmd)
 
     if node == masternode:
@@ -80,7 +86,8 @@ def main():
 
       #start the NFS server on the master node.
       cmd = ["ssh","{}".format(node),"-x",r"ssh -o StrictHostKeyChecking=no -i {}/darwindkr.rsa docker@{} -x sudo /etc/init.d/nfs-kernel-server start".format(os.path.dirname(os.path.realpath(__file__)),nodeip)]
-      print cmd
+      if result.verbose:
+        print cmd
       subprocess.call(cmd)
 
 
@@ -88,15 +95,18 @@ def main():
     else:
 
       cmd = ["ssh","{}".format(node),"-x",r"ssh -o StrictHostKeyChecking=no -i {}/darwindkr.rsa docker@{} -x /home/docker/h3ddocker/build_h3d.sh".format(os.path.dirname(os.path.realpath(__file__)),nodeip)]
-      print cmd
+      if result.verbose:
+        print cmd
       subprocess.call(cmd)
 
       cmd = ["ssh","{}".format(node),"-x",r"ssh -o StrictHostKeyChecking=no -i {}/darwindkr.rsa docker@{} -x sudo mount {}:/h3dshare /h3dshare".format(os.path.dirname(os.path.realpath(__file__)),nodeip,master_prv_ip)]
-      print cmd
+      if result.verbose:
+        print cmd
       subprocess.call(cmd)
 
       cmd = ["ssh","{}".format(node),"-x",r"ssh -o StrictHostKeyChecking=no -i {}/darwindkr.rsa docker@{} -x 'nohup /home/docker/h3ddocker/run_sshd.sh > /home/docker/h3ddocker/h3derrlog.out 2>&1 &'".format(os.path.dirname(os.path.realpath(__file__)),nodeip)]
-      print cmd
+      if result.verbose:
+        print cmd
       subprocess.call(cmd)
 
   # build the machinefile
@@ -111,19 +121,23 @@ def main():
 
   # now build the master container -- must have machinefile first
   cmd = ["ssh","{}".format(masternode),"-x",r"ssh -o StrictHostKeyChecking=no -i {}/darwindkr.rsa docker@{} -x /home/docker/h3ddocker/build_h3d.sh".format(os.path.dirname(os.path.realpath(__file__)),masterip)]
-  print cmd
+  if result.verbose:
+    print cmd
   subprocess.call(cmd)
 
   # start the code on the master
-  cmd = ["ssh","{}".format(masternode),"-x",r"ssh -o StrictHostKeyChecking=no -i {}/darwindkr.rsa docker@{} -x 'nohup /home/docker/h3ddocker/run_h3d.sh > /home/docker/h3ddocker/h3drunlog.out 2>&1 &'".format(os.path.dirname(os.path.realpath(__file__)),masterip)]
-  print cmd
-  subprocess.call(cmd)
+  if not result.interactive:
+    cmd = ["ssh","{}".format(masternode),"-x",r"ssh -o StrictHostKeyChecking=no -i {}/darwindkr.rsa docker@{} -x 'nohup /home/docker/h3ddocker/run_h3d.sh > /home/docker/h3ddocker/h3drunlog.out 2>&1 &'".format(os.path.dirname(os.path.realpath(__file__)),masterip)]
+    if result.verbose:
+      print cmd
+    subprocess.call(cmd)
+  else:
+    print "Launching in interactive mode.  Login to master to start simulation."
 
   # Give the user information.
   print "Launched H3D on a Darwin cluster with masterr node."
-  print 'Node {} VM IP {}.'.format(masternode,masterip)
+  print 'Master node {} VM IP {}.'.format(masternode,masterip)
   print r"ssh -t {} 'ssh -o StrictHostKeyChecking=no -i {}/darwindkr.rsa docker@{}'".format(masternode,os.path.dirname(os.path.realpath(__file__)),masterip)
- 
 
 
 if __name__ == "__main__":

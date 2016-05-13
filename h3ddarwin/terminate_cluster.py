@@ -7,6 +7,7 @@ import re
 def main():
 
   parser = argparse.ArgumentParser(description='Terminate all VMs on darwin.')
+  parser.add_argument('--verbose', action="store_true")
   parser.add_argument('--node', action="append")
   parser.add_argument('template', action="store" )
   parser.add_argument('tmpdir', action="store" )
@@ -25,15 +26,18 @@ def main():
     runxml = "{}/{}.xml".format(os.path.abspath(result.tmpdir),runname) 
 
     cmd = ["ssh","{}".format(node),"-x",r"virsh 'connect qemu:///system; destroy {}; undefine {}'".format(runname,runname)]
-    print cmd
+    if result.verbose:
+      print cmd
     subprocess.call(cmd)
 
     cmd=["rm", "-f", "{}".format(runimg)]
-    print cmd
+    if result.verbose:
+      print cmd
     subprocess.call(cmd)
 
     cmd=["rm", "{}".format(runxml)]
-    print cmd
+    if result.verbose:
+      print cmd
     subprocess.call(cmd)
 
 if __name__ == "__main__":
