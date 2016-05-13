@@ -13,6 +13,8 @@ It is customized for Darwin and will not work without modification on other clus
   * machine\_img.qcow2: a virtual machine image that contains the source code (research do not distributed) in expected places.  You should use _/projects/groups/vizproject/VMs/dkrh3dubu16.img_ unless you have customized an image.
   * run_directory: temporary directory used to run the cluster.  This needs to be shared among all nodes in the cluster.  It would be desirable to place this on memory or an SSD if/when shared fast storage is available.
   * --node <node1>: add one entry for each node.  Machine name only, not FQDN.
+  * --verbose: produce verbose output
+  * --interactive: launch the cluster but don't start the code.  You will have to log into the master and start manually.
 
 A typical launch process might look like:
 ````
@@ -45,3 +47,14 @@ This will destroy all the virtual machines and remove all data.  You __MUST__ ge
 ````
   python terminate_cluster.py <machine_img.qcow2> <run_directory> --node <node0> --node <node1> ... --node <noden>
 ````
+
+<h3> Customzing H3D </h3>
+
+The code launches a preconfigured virtual machine image _/projects/groups/vizprojects/VMs/dkrh3dubu16.qcow2_ 
+that contains the BEE-atified H3D code from Darwin in /home/docker/h3ddarwin.  The BEE-atified code
+is available at https://github.com/randalburns/h3ddocker.git (for collaborators only).
+
+To customize the code, you can launch the cluster interactively, edit/pull customizations to the 
+BEE-atified launch scripts and run manually.  To automate customizations you will need to 
+create a customized virtual machine base image.  See https://darwin.lanl.gov/projects/virtualized-environments/wiki/Virtual_Machine_Images_on_Darwin. 
+

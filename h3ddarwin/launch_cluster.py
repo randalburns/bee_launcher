@@ -22,7 +22,7 @@ def main():
     m = re.match('cn(\d+)',node)
     nodeid = int(m.group(1))
 
-    runname = "dkr_{}".format(node)
+    runname = "h3ddkr_{}".format(node)
     runimg = "{}/{}.qcow2".format(os.path.abspath(result.tmpdir),runname)
     runxml = "{}/{}.xml".format(os.path.abspath(result.tmpdir),runname) 
 
@@ -105,7 +105,7 @@ def main():
     mfilestr += "{}:16\n".format(mpiaddr)
 
   # build a machinefile
-  cmd = ["ssh","{}".format(masternode),"-x",r"ssh -o StrictHostKeyChecking=no -i {}/darwindkr.rsa docker@{} -x 'cat > /home/docker/h3ddocker/machinefile'".format(os.path.dirname(os.path.realpath(__file__)),nodeip)]
+  cmd = ["ssh","{}".format(masternode),"-x",r"ssh -o StrictHostKeyChecking=no -i {}/darwindkr.rsa docker@{} -x 'cat > /home/docker/h3ddocker/machinefile'".format(os.path.dirname(os.path.realpath(__file__)),masterip)]
   p = subprocess.Popen ( cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)  
   output = p.communicate(input=mfilestr)
 
@@ -122,7 +122,7 @@ def main():
   # Give the user information.
   print "Launched H3D on a Darwin cluster with masterr node."
   print 'Node {} VM IP {}.'.format(masternode,masterip)
-  print r"ssh {} 'ssh -o StrictHostKeyChecking=no -i {}/darwindkr.rsa docker@{}'".format(masternode,os.path.dirname(os.path.realpath(__file__)),masterip)
+  print r"ssh -t {} 'ssh -o StrictHostKeyChecking=no -i {}/darwindkr.rsa docker@{}'".format(masternode,os.path.dirname(os.path.realpath(__file__)),masterip)
  
 
 

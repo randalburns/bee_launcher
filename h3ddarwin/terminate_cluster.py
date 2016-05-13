@@ -6,7 +6,7 @@ import re
 
 def main():
 
-  parser = argparse.ArgumentParser(description='Launch H3D in a VM on this darwin node')
+  parser = argparse.ArgumentParser(description='Terminate all VMs on darwin.')
   parser.add_argument('--node', action="append")
   parser.add_argument('template', action="store" )
   parser.add_argument('tmpdir', action="store" )
@@ -20,7 +20,7 @@ def main():
     m = re.match('cn(\d+)',node)
     nodeid = int(m.group(1))
 
-    runname = "dkr_{}".format(node)
+    runname = "h3ddkr_{}".format(node)
     runimg = "{}/{}.qcow2".format(os.path.abspath(result.tmpdir),runname)
     runxml = "{}/{}.xml".format(os.path.abspath(result.tmpdir),runname) 
 
@@ -28,7 +28,7 @@ def main():
     print cmd
     subprocess.call(cmd)
 
-    cmd=["rm", "{}".format(runimg)]
+    cmd=["rm", "-f", "{}".format(runimg)]
     print cmd
     subprocess.call(cmd)
 
