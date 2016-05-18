@@ -24,8 +24,8 @@ Then you need to create the run_directory; in this example, we use tmp
 ````
   python launch_cluster.py <template.xml> <machine_img.qcow2> <run_directory> --node <node0> --node <node1> ... --node <noden>
 ````
-  * template.xml: describes the KVM configuration for each node's virtual machine.  The repository provides _./template\_dkrh3d.xml_ for nodes on the galton partition.
-  * machine\_img.qcow2: a virtual machine image that contains the source code (research do not distributed) in expected places.  You should use _/projects/groups/vizproject/VMs/dkrh3dubu16.img_ unless you have customized an image.
+  * template.xml: describes the KVM configuration for each node's virtual machine.  The repository provides _./template\_qgmpas.xml_ for nodes on the galton partition.
+  * machine\_img.qcow2: a virtual machine image that contains the source code (research do not distributed) in expected places.  You should use _/projects/groups/vizproject/VMs/qgmpasubu16.img_ unless you have customized an image.
   * run_directory: temporary directory used to run the cluster.  This needs to be shared among all nodes in the cluster.  It would be desirable to place this on memory or an SSD if/when shared fast storage is available.
   * --node <node1>: add one entry for each node.  Machine name only, not FQDN.
   * --verbose: produce verbose output
@@ -35,7 +35,7 @@ A typical launch process might look like:
 ````
 darwin-fe> salloc -N 2 -p galton
 darwin-fe> squeue -u <username>       // say this returns cn180 and cn181
-darwin-fe> python launch_cluster.py ./template_dkrmpas.xml /projects/groups/vizproject/VMs/qgmpasubu16.qcow2 ./tmp --node cn180 --node cn181
+darwin-fe> python launch_cluster.py ./template_qgmpas.xml /projects/groups/vizproject/VMs/qgmpasubu16.qcow2 ./tmp --node cn180 --node cn181
 ````
 
 This script will do the following:
