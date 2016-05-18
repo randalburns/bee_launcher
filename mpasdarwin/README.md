@@ -24,7 +24,7 @@ Then you need to create the run_directory; in this example, we use tmp
 ````
   python launch_cluster.py <template.xml> <machine_img.qcow2> <run_directory> --node <node0> --node <node1> ... --node <noden>
 ````
-  * template.xml: describes the KVM configuration for each node's virtual machine.  The repository provides _./template\_qgmpas.xml_ for nodes on the galton partition.
+  * template.xml: describes the KVM configuration for each node's virtual machine.  The repository provides _./template\_qgmpas.xml_ for nodes on the galton partition. If you want to change the virtual machine configuration, for example, more memory or more cpus, please refer to _https://libvirt.org/formatdomain.html_ for the instruction of modifying a domain configuration file.
   * machine\_img.qcow2: a virtual machine image that contains the source code (research do not distributed) in expected places.  You should use _/projects/groups/vizproject/VMs/qgmpasubu16.img_ unless you have customized an image.
   * run_directory: temporary directory used to run the cluster.  This needs to be shared among all nodes in the cluster.  It would be desirable to place this on memory or an SSD if/when shared fast storage is available.
   * --node <node1>: add one entry for each node.  Machine name only, not FQDN.
