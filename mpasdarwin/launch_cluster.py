@@ -3,6 +3,7 @@ import os
 import subprocess
 import re
 import tempfile
+import uuid # for generating UUID
 
 def main():
 
@@ -42,7 +43,7 @@ def main():
     # Rewrite the template
     cmd = ["sed","-i","s/NNNNNN/{}/".format(runname),"{}".format(runxml)]
     subprocess.call(cmd)
-    cmd = ["sed","-i","s/UUUUUU/{0:06d}/".format(nodeid),"{}".format(runxml)]
+    cmd = ["sed","-i","s/UUUUUUUU-UUUU-UUUU-UUUU-UUUUUUUUUUUU/{}/".format(str(uuid.uuid1())),"{}".format(runxml)]
     subprocess.call(cmd)
     cmd = ["sed","-i","s/MM:MM:MM/00:00:{0:02x}/".format(nodeid),"{}".format(runxml)]
     subprocess.call(cmd)

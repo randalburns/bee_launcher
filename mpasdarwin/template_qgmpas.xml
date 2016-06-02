@@ -1,6 +1,6 @@
 <domain type='kvm'>
   <name>NNNNNN</name>
-  <uuid>e5fb97b4-271d-4099-9f5b-f6b5e3UUUUUU</uuid>
+  <uuid>UUUUUUUU-UUUU-UUUU-UUUU-UUUUUUUUUUUU</uuid>
   <memory unit='KiB'>67108864</memory>
   <currentMemory unit='KiB'>67108864</currentMemory>
   <vcpu placement='static'>16</vcpu>
