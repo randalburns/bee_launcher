@@ -20,6 +20,7 @@ A typical launch process might look like:
 ````
 darwin-fe> salloc -N 2 -p galton
 darwin-fe> squeue -u <username>       // say this returns cn180 and cn181
+darwin-fe> chmod 600 darwindkr.*
 darwin-fe> python launch\_cluster.py ./template\_dkrvpic.xml /projects/groups/vizproject/VMs/dkrvpicubu16.qcow2 ./tmp --node cn180 --node cn181
 ````
 
