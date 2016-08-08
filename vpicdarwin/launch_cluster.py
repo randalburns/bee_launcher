@@ -7,18 +7,25 @@ import uuid # for generating UUID
 
 def main():
 
-  parser = argparse.ArgumentParser(description='Launch H3D in a VM on this darwin node')
+  parser = argparse.ArgumentParser(description='Launch VPIC in a VM on this darwin node')
   parser.add_argument('--verbose', action="store_true")
   parser.add_argument('--interactive', action="store_true")
   parser.add_argument('--node', action="append")
   parser.add_argument('template', action="store" )
-  parser.add_argument('qcow2image', action="store" )
+  parser.add_argument('qcow2image', action="store")
+  parser.add_argument('dataimage', action="store")
+  parser.add_argument('templatedata', action="store")
   parser.add_argument('tmpdir', action="store" )
 
   result = parser.parse_args()
 
+  mpiaddrs = []
+  masternode = sorted(result.node)[0]
+
   qcow2image = os.path.abspath(result.qcow2image)
+  dataimage = os.path.abspath(result.dataimage)
   template = os.path.abspath(result.template)
+  templatedata = os.path.abspath(result.templatedata)
 
   for node in sorted(result.node):
 
@@ -28,16 +35,28 @@ def main():
     runname = "vpicdkr_{}".format(node)
     runimg = "{}/{}.qcow2".format(os.path.abspath(result.tmpdir),runname)
     runxml = "{}/{}.xml".format(os.path.abspath(result.tmpdir),runname) 
+    dataimg = "{}/{}_data.qcow2".format(os.path.abspath(result.tmpdir),runname)	
 
+    # for the main image
     cmd=["qemu-img","create","-b","{}".format(qcow2image),"-f","qcow2","{}".format(runimg)]
     if result.verbose:
       print cmd
     subprocess.call(cmd)
-
-    cmd = ["cp","{}".format(template),"{}".format(runxml)]
+    if node == masternode:
+    	cmd=["qemu-img","create", "-b", "{}".format(dataimage), "-f", "qcow2", "{}".format(dataimg) ]
+    	if result.verbose:
+     	   print cmd
+    	subprocess.call(cmd)
+    
+    cmd = ["cp","{}".format(template), "{}".format(runxml)]
     if result.verbose:
       print cmd
     subprocess.call(cmd)
+    cmd = ["cp","{}".format(templatedata), "{}".format(os.path.abspath(result.tmpdir))]
+    if result.verbose:
+      print cmd
+    subprocess.call(cmd)
+    
 
     # Rewrite the template
     cmd = ["sed","-i","s/NNNNNN/{}/".format(runname),"{}".format(runxml)]
@@ -48,18 +67,24 @@ def main():
     subprocess.call(cmd)
     cmd = ["sed","-i","s#FFFFFF#{}#".format(runimg),"{}".format(runxml)]
     subprocess.call(cmd)
+    # For Master node only
+    # We need to configure the extra image
+    if node == masternode:
+    	cmd = ["sed", "-i", "/\/disk\>/r {}".format(templatedata), "{}".format(runxml)]
+	print cmd
+    	subprocess.call(cmd)
+    	cmd = ["sed","-i","s#DDDDDD#{}#".format(dataimg),"{}".format(runxml)]
+	print cmd
+    	subprocess.call(cmd)
+    
 
     cmd = ["ssh","{}".format(node),"-x",r"virsh 'connect qemu:///system; define {}; start {}'".format(runxml,runname)]
     if result.verbose:
       print cmd
     subprocess.call(cmd)
 
-  print "Waiting 10 seconds for nodes to come up";
-  import time; time.sleep(10)
-
-  mpiaddrs = []
-
-  masternode = sorted(result.node)[0]
+  print "Waiting 15 seconds for nodes to come up";
+  import time; time.sleep(15)
 
   # launch the ssh daemons and build the hostfile and machinefile
   for node in sorted(result.node):
@@ -73,7 +98,7 @@ def main():
     nodeip = m.group(1)
 
     mpiaddrs.append('10.0.0.{}'.format(nodeid))
-
+    
     # activate the second interface on the darwin node
     cmd = ["ssh", "{}".format(node),"-x", r"ssh -o StrictHostKeyChecking=no -i {}/darwindkr.rsa docker@{} -x 'sudo /sbin/ifconfig ens8 10.0.0.{} netmask 255.255.255.0'".format(os.path.dirname(os.path.realpath(__file__)),nodeip,nodeid)]
     if result.verbose:
@@ -95,6 +120,13 @@ def main():
 
       masterip = nodeip
       master_prv_ip = '10.0.0.{}'.format(nodeid)
+      
+      # mount the extra image to /vmshare for NFS
+      cmd = ["ssh","{}".format(node),"-x",r"ssh -o StrictHostKeyChecking=no -i {}/darwindkr.rsa docker@{} -x sudo mount /dev/sdb /vmshare".format(os.path.dirname(os.path.realpath(__file__)),nodeip)]
+      if result.verbose:
+        print cmd
+      subprocess.call(cmd)
+
 
       #start the NFS server on the master node.
       cmd = ["ssh","{}".format(node),"-x",r"ssh -o StrictHostKeyChecking=no -i {}/darwindkr.rsa docker@{} -x sudo /etc/init.d/nfs-kernel-server start".format(os.path.dirname(os.path.realpath(__file__)),nodeip)]
@@ -109,7 +141,8 @@ def main():
       if result.verbose:
         print cmd
       subprocess.call(cmd)
-
+	
+       # Let the client to mount the exported file system from the server which contains the input stack
       cmd = ["ssh","{}".format(node),"-x",r"ssh -o StrictHostKeyChecking=no -i {}/darwindkr.rsa docker@{} -x sudo mount {}:/vmshare /vmshare".format(os.path.dirname(os.path.realpath(__file__)),nodeip,master_prv_ip)]
       if result.verbose:
         print cmd

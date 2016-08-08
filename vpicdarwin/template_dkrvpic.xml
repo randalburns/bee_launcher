@@ -1,6 +1,6 @@
 <domain type='kvm'>
   <name>NNNNNN</name>
-  <uuid>e5fb97b4-271d-4099-9f5b-f6b5e3UUUUUU</uuid>
+  <uuid>UUUUUUUU-UUUU-UUUU-UUUU-UUUUUUUUUUUU</uuid>
   <memory unit='KiB'>67108864</memory>
   <currentMemory unit='KiB'>67108864</currentMemory>
   <vcpu placement='static'>16</vcpu>
@@ -34,7 +34,7 @@
       <source file='FFFFFF'/>
       <target dev='hda' bus='ide'/>
       <address type='drive' controller='0' bus='0' target='0' unit='0'/>
-    </disk>
+    </disk>  
     <controller type='usb' index='0' model='ich9-ehci1'>
       <address type='pci' domain='0x0000' bus='0x00' slot='0x06' function='0x7'/>
     </controller>
