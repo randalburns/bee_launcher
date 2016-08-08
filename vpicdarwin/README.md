@@ -21,12 +21,12 @@ A typical launch process might look like:
 darwin-fe> salloc -N 2 -p galton
 darwin-fe> squeue -u <username>       // say this returns cn180 and cn181
 darwin-fe> chmod 600 darwindkr.*
-darwin-fe> python launch\_cluster.py ./template\_dkrvpic.xml /projects/groups/vizproject/VMs/dkrvpicubu16.qcow2 ./tmp --node cn180 --node cn181
+darwin-fe> python launch\_cluster.py ./template_dkrvpic.xml /projects/groups/vizproject/VMs/dkrvpicubu16.qcow2 /projects/groups/vizproject/VMs/vpicextra.qcow2 ./template_extra.xml ./tmp --node cn180 --node cn181
 ````
 
 This script will do the following:
  * thin provision virtual machines from the base image--it will not change the given machine image.
- * launch a virtual machine on each node
+ * launch a virtual machine on each node and mount the extra input image as the data storage.
  * build the VPIC docker image on each machine
  * launch docker images waiting to receive requests on all nodes
  * start the code on the master (first) node
